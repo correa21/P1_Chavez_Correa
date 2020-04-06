@@ -11,6 +11,7 @@
 
 #include <stdint.h>
 #include "Bits.h"
+#include "rtos_i2c.h"
 
 #define BMI160_MODE_t 			uint8_t
 #define BMI160_BASE_ADDRESS_t 	uint8_t
@@ -33,6 +34,7 @@
 #define BMI160_ACC_Z_LSB_REG 	0x16
 #define BMI160_ACC_Z_MSB_REG 	0x17
 
+
 typedef struct{
 
 	BMI160_BASE_ADDRESS_t 	base_address;
@@ -49,6 +51,6 @@ typedef struct {
 	uint16_t z;
 }BMI160_data_t;
 
-BooleanType BMI160_Init();
+BooleanType BMI160_Init(BMI160_config_t configuration);
 
 #endif /* BMI160_H_ */
