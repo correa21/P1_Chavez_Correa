@@ -55,7 +55,7 @@ BooleanType BMI160_Init(BMI160_config_t configuration)
 	return TRUE;
 }
 
-BMI160_data_t BMI160_get_acc()
+BMI160_data_t BMI160_get_acc(void)
 {
 BMI160_data_t acc_data;
 	uint8_t MSB = 0;
@@ -78,7 +78,7 @@ BMI160_data_t acc_data;
 
 	return acc_data;
 };
-BMI160_data_t BMI160_get_gyro()
+BMI160_data_t BMI160_get_gyro(void)
 {
 BMI160_data_t gyro_data;
 	uint8_t MSB = 0;

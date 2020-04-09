@@ -42,7 +42,27 @@
 /* TODO: insert other include files here. */
 #include "mahony.h"
 #include "BMI160.h"
+#include "rtos_uart.h"
 /* TODO: insert other definitions and declarations here. */
+
+/**UART definitions for future configuration */
+#define UART_BR			115200U
+#define	UART			rtos_uart0
+#define UART_PORT		0U
+#define UART_RX_PIN		0U
+#define UART_TX_PIN		0U
+#define UART_PIN_MUX	0U
+
+/**I2C definitions for future configuration */
+#define I2C_BR			115200U
+#define	I2C				rtos_i2c_0
+#define I2C_PORT		0U
+#define I2C_SCL_PIN		0U
+#define I2C_SDA_PIN		0U
+#define I2C_PIN_MUX		0U
+
+
+
 
 typedef struct{
 	uint32_t header;
@@ -51,7 +71,8 @@ typedef struct{
 	float z;
 }comm_msg_t;
 
-void mainTask(void* PvParameters)
+void mainTask(void* parameters);
+void setupTask(void* parameters);
 
 /*
  * @brief   Application entry point.
@@ -78,3 +99,46 @@ int main(void) {
     }
     return 0 ;
 }
+void setupTask(void* parameters)
+{
+	rtos_uart_config_t uart_config;
+	rtos_i2c_config_t i2c_config;
+	BMI160_config_t bmi160_config;
+
+	uart_config.baudrate = UART_BR;
+	uart_config.uart_number = UART;
+	uart_config.port = UART_PORT;
+	uart_config.rx_pin = UART_RX_PIN;
+	uart_config.tx_pin = UART_TX_PIN;
+	uart_config.pin_mux = UART_PIN_MUX;
+
+	/**This i2c configuration will be use as the i2c port configuration for the bmi160 sensor*/
+	i2c_config.i2c_number = I2C;
+	i2c_config.baudrate = I2C_BR;
+	i2c_config.port = I2C_PORT;
+	i2c_config.SCL_pin = I2C_SCL_PIN;
+	i2c_config.SDA_pin = I2C_SDA_PIN;
+	i2c_config.pin_mux = I2C_PIN_MUX;
+
+	bmi160_config.base_address = BMI160_SLAVE_ADDRESS;
+	bmi160_config.sub_address = BMI160_CMD_REGISTER;
+	bmi160_config.acc_mode = BMI160_ACC_NORMAL_MODE;
+	bmi160_config.gyro_mode = BMI160_GYRO_NORMAL_MODE;
+	bmi160_config.i2c_port_config = i2c_config;
+
+	while(rtos_uart_init(&uart_config))
+	{
+		//do nothing till the the UART port is correctly initialized
+	};
+
+	while(!BMI160_Init(&bmi160_config))
+	{
+		//do nothing till the the i2c and BMI160 are correctly initialized
+	};
+
+	xTaskCreate(mainTask, "mainTask", 200, NULL, configMAX_PRIORITIES, NULL);
+
+	/**This task have no other purpose, so we suspend it */
+	vTaskSuspend(NULL);
+
+};
