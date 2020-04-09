@@ -52,5 +52,7 @@ typedef struct {
 }BMI160_data_t;
 
 BooleanType BMI160_Init(BMI160_config_t configuration);
+BMI160_data_t BMI160_get_acc();
+BMI160_data_t BMI160_get_gyro();
 
 #endif /* BMI160_H_ */
