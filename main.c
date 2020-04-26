@@ -159,7 +159,25 @@ void setupTask(void* parameters)
 
 void mainTask(void* parameters)
 {
-	  while(1) {
 
+	 MahonyAHRSEuler_t mahony_data; /** IMU Return data from Mahony Lib**/
+	 comm_msg_t UART_data_2_send;   /** Data 2 send over the uart interface**/
+
+	 BMI160_data_t acc;             /** Return values from BMI160 Lib**/
+	 BMI160_data_t gyr;
+
+
+
+	  while(1)
+	  {
+
+		  acc = BMI160_get_acc();
+		  gyr = BMI160_get_gyro();
+		  PRINTF("acc: x = %i, y = %i, z = %i\n\r",acc.x, acc.y, acc.z);
+		  PRINTF("gyr: x = %i, y = %i, z = %i\n\r",gyr.x, gyr.y, gyr.z);
+
+
+//		  rtos_uart_send(UART,&UART_data_2_send,sizeof(UART_data_2_send));
+		  vTaskDelay(100);
 	    }
 }

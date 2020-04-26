@@ -25,7 +25,7 @@ BooleanType BMI160_Init(BMI160_config_t configuration)
 	{
 		return FALSE;
 	}
-	g_port.port = configuration.i2c_port_config.port;
+	g_port.port = configuration.i2c_port_config.i2c_number;
 	g_port.bmi_addres = configuration.base_address;
 	/*accelerometer initialization*/
 	i2c_status = rtos_i2c_transfer(configuration.i2c_port_config.i2c_number,
