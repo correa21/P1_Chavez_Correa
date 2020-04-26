@@ -52,10 +52,10 @@
 /**UART definitions for future configuration */
 #define UART_BR			115200U
 #define	UART			rtos_uart0
-#define UART_PORT		0U
-#define UART_RX_PIN		0U
-#define UART_TX_PIN		0U
-#define UART_PIN_MUX	0U
+#define UART_PORT		rtos_uart_portB
+#define UART_RX_PIN		16U
+#define UART_TX_PIN		17U
+#define UART_PIN_MUX	3U
 
 /**I2C definitions for future configuration */
 #define I2C_BR			115200U
@@ -102,7 +102,7 @@ int main(void) {
 void setupTask(void* parameters)
 {
 	rtos_uart_config_t uart_config;
-	rtos_i2c_config_t i2c_config;
+//	rtos_i2c_config_t i2c_config;
 	BMI160_config_t bmi160_config;
 
 	uart_config.baudrate = UART_BR;
@@ -113,28 +113,41 @@ void setupTask(void* parameters)
 	uart_config.pin_mux = UART_PIN_MUX;
 
 	/**This i2c configuration will be use as the i2c port configuration for the bmi160 sensor*/
-	i2c_config.i2c_number = I2C;
-	i2c_config.baudrate = I2C_BR;
-	i2c_config.port = I2C_PORT;
-	i2c_config.SCL_pin = I2C_SCL_PIN;
-	i2c_config.SDA_pin = I2C_SDA_PIN;
-	i2c_config.pin_mux = I2C_PIN_MUX;
+//	i2c_config.i2c_number = I2C;
+//	i2c_config.baudrate = I2C_BR;
+//	i2c_config.port = I2C_PORT;
+//	i2c_config.SCL_pin = I2C_SCL_PIN;
+//	i2c_config.SDA_pin = I2C_SDA_PIN;
+//	i2c_config.pin_mux = I2C_PIN_MUX;
 
 	bmi160_config.base_address = BMI160_SLAVE_ADDRESS;
 	bmi160_config.sub_address = BMI160_CMD_REGISTER;
 	bmi160_config.acc_mode = BMI160_ACC_NORMAL_MODE;
 	bmi160_config.gyro_mode = BMI160_GYRO_NORMAL_MODE;
-	bmi160_config.i2c_port_config = i2c_config;
+	//bmi160_config.i2c_port_config = i2c_config;
+	bmi160_config.i2c_port_config.i2c_number = I2C;
+	bmi160_config.i2c_port_config.baudrate = I2C_BR;
+	bmi160_config.i2c_port_config.port = I2C_PORT;
+	bmi160_config.i2c_port_config.SCL_pin = I2C_SCL_PIN;
+	bmi160_config.i2c_port_config.SDA_pin = I2C_SDA_PIN;
+	bmi160_config.i2c_port_config.pin_mux = I2C_PIN_MUX;
 
-	while(rtos_uart_init(uart_config))
-	{
-		//do nothing till the the UART port is correctly initialized
-	};
+//	while(rtos_uart_init(uart_config))
+//	{
+//		//do nothing till the the UART port is correctly initialized
+//	};
+//
+//	while(!BMI160_Init(bmi160_config))
+//	{
+//		//do nothing till the the i2c and BMI160 are correctly initialized
+//	};
+	rtos_uart_flag_t flag = 0;
+	BooleanType      flag2 = 0;
 
-	while(!BMI160_Init(bmi160_config))
-	{
-		//do nothing till the the i2c and BMI160 are correctly initialized
-	};
+	flag = rtos_uart_init(uart_config);
+	flag2 = BMI160_Init(bmi160_config);
+
+
 
 	xTaskCreate(mainTask, "mainTask", 200, NULL, configMAX_PRIORITIES, NULL);
 
