@@ -37,12 +37,16 @@
 #include "peripherals.h"
 #include "pin_mux.h"
 #include "clock_config.h"
-#include "MK66F18.h"
+#include "MK64F12.h"
 #include "fsl_debug_console.h"
+#include "FreeRTOSConfig.h"
+#include "task.h"
+
 /* TODO: insert other include files here. */
 #include "mahony.h"
 #include "BMI160.h"
 #include "rtos_uart.h"
+#include "Bits.h"
 /* TODO: insert other definitions and declarations here. */
 
 /**UART definitions for future configuration */
@@ -56,10 +60,10 @@
 /**I2C definitions for future configuration */
 #define I2C_BR			115200U
 #define	I2C				rtos_i2c_0
-#define I2C_PORT		0U
-#define I2C_SCL_PIN		0U
-#define I2C_SDA_PIN		0U
-#define I2C_PIN_MUX		0U
+#define I2C_PORT		rtos_i2c_portB
+#define I2C_SCL_PIN		2U
+#define I2C_SDA_PIN		3U
+#define I2C_PIN_MUX		2U
 
 
 
@@ -86,16 +90,12 @@ int main(void) {
   	/* Init FSL debug console. */
     BOARD_InitDebugConsole();
 
-    PRINTF("Hello World\n");
+    xTaskCreate(setupTask, "setupTask", 200, NULL, configMAX_PRIORITIES, NULL);
 
-    /* Force the counter to be placed into memory. */
-    volatile static int i = 0 ;
-    /* Enter an infinite loop, just incrementing a counter. */
+    vTaskStartScheduler();
+
     while(1) {
-        i++ ;
-        /* 'Dummy' NOP to allow source level single stepping of
-            tight while() loop */
-        __asm volatile ("nop");
+
     }
     return 0 ;
 }
@@ -126,12 +126,12 @@ void setupTask(void* parameters)
 	bmi160_config.gyro_mode = BMI160_GYRO_NORMAL_MODE;
 	bmi160_config.i2c_port_config = i2c_config;
 
-	while(rtos_uart_init(&uart_config))
+	while(rtos_uart_init(uart_config))
 	{
 		//do nothing till the the UART port is correctly initialized
 	};
 
-	while(!BMI160_Init(&bmi160_config))
+	while(!BMI160_Init(bmi160_config))
 	{
 		//do nothing till the the i2c and BMI160 are correctly initialized
 	};
@@ -141,4 +141,12 @@ void setupTask(void* parameters)
 	/**This task have no other purpose, so we suspend it */
 	vTaskSuspend(NULL);
 
-};
+}
+
+
+void mainTask(void* parameters)
+{
+	  while(1) {
+
+	    }
+}
