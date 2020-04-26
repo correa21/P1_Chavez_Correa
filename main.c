@@ -161,23 +161,42 @@ void mainTask(void* parameters)
 {
 
 	 MahonyAHRSEuler_t mahony_data; /** IMU Return data from Mahony Lib**/
-	 comm_msg_t UART_data_2_send;   /** Data 2 send over the uart interface**/
+
+
+	 comm_msg_t UART_data_send;   /** Data 2 send over the uart interface**/
+
 
 	 BMI160_data_t acc;             /** Return values from BMI160 Lib**/
 	 BMI160_data_t gyr;
 
-
+	 UART_data_send.header = 0xAAAAAAAA; /** Defined header to send over UART**/
 
 	  while(1)
 	  {
 
-		  acc = BMI160_get_acc();
+		  acc = BMI160_get_acc();  /** GEt values from BMI160 Layer**/
 		  gyr = BMI160_get_gyro();
+
+		  PRINTF("BMI values \r\n");										/** DEBUG PRINTS**/
 		  PRINTF("acc: x = %i, y = %i, z = %i\n\r",acc.x, acc.y, acc.z);
 		  PRINTF("gyr: x = %i, y = %i, z = %i\n\r",gyr.x, gyr.y, gyr.z);
 
+		  mahony_data = MahonyAHRSupdateIMU(gyr.x, gyr.y,  gyr.z, acc.x, acc.y,  acc.z);  /** Change values to navigation values**/
 
-//		  rtos_uart_send(UART,&UART_data_2_send,sizeof(UART_data_2_send));
+		  PRINTF("Mahony values \r\n");										/** DEBUG PRINTS**/
+		  PRINTF("Acc -> Roll: x = %i, Pitch = %i, Yaw = %i\n\r",mahony_data.roll, mahony_data.pitch,mahony_data.yaw);
+
+
+
+		  UART_data_send.x = mahony_data.roll;    /** Create the Struct to send over UART**/
+		  UART_data_send.y = mahony_data.pitch;
+		  UART_data_send.z = mahony_data.yaw;
+
+
+		  PRINTF("UART PRINTS \r\n");
+//		  rtos_uart_send(UART,&UART_data_send,sizeof(UART_data_send));
+
+
 		  vTaskDelay(100);
 	    }
 }
