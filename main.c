@@ -191,8 +191,8 @@ void mainTask(void* parameters)
 
 
 
-		  UART_data_send.x = -mahony_data.roll;    /** Create the Struct to send over UART**/
-		  UART_data_send.y = -mahony_data.pitch;
+		  UART_data_send.x = mahony_data.roll;    /** Create the Struct to send over UART**/
+		  UART_data_send.y = mahony_data.pitch;
 		  UART_data_send.z = mahony_data.yaw;
 
 		  pointer_2_uart = &UART_data_send;
@@ -206,6 +206,6 @@ void mainTask(void* parameters)
 
 
 
-		  vTaskDelay(30);
+		  vTaskDelay(50); /** Refresh Rate of the cube**/
 	    }
 }
