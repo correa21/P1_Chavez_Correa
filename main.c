@@ -164,7 +164,7 @@ void mainTask(void* parameters)
 
 
 	 comm_msg_t UART_data_send;   /** Data 2 send over the uart interface**/
-
+	 comm_msg_t * pointer_2_uart;
 
 	 BMI160_data_t acc;             /** Return values from BMI160 Lib**/
 	 BMI160_data_t gyr;
@@ -177,26 +177,35 @@ void mainTask(void* parameters)
 		  acc = BMI160_get_acc();  /** GEt values from BMI160 Layer**/
 		  gyr = BMI160_get_gyro();
 
-		  PRINTF("BMI values \r\n");										/** DEBUG PRINTS**/
-		  PRINTF("acc: x = %i, y = %i, z = %i\n\r",acc.x, acc.y, acc.z);
-		  PRINTF("gyr: x = %i, y = %i, z = %i\n\r",gyr.x, gyr.y, gyr.z);
+//		  PRINTF("BMI values \r\n");										/** DEBUG PRINTS**/
+//		  PRINTF("acc: x = %i, y = %i, z = %i\n\r",acc.x, acc.y, acc.z);
+//		  PRINTF("gyr: x = %i, y = %i, z = %i\n\r",gyr.x, gyr.y, gyr.z);
 
-		  mahony_data = MahonyAHRSupdateIMU(gyr.x, gyr.y,  gyr.z, acc.x, acc.y,  acc.z);  /** Change values to navigation values**/
+		  mahony_data = MahonyAHRSupdateIMU((float)gyr.x*DEGREES/DATA_RANGE_GYRO,
+				  	  	  	  	  	  	    (float)gyr.y*DEGREES/DATA_RANGE_GYRO,
+											(float)gyr.z*DEGREES/DATA_RANGE_GYRO,
+											acc.x, acc.y,  acc.z);  /** Change values to navigation values**/
 
-		  PRINTF("Mahony values \r\n");										/** DEBUG PRINTS**/
-		  PRINTF("Acc -> Roll: x = %i, Pitch = %i, Yaw = %i\n\r",mahony_data.roll, mahony_data.pitch,mahony_data.yaw);
+//		  PRINTF("Mahony values \r\n");										/** DEBUG PRINTS**/
+//		  PRINTF("Acc -> Roll: x = %i, Pitch = %i, Yaw = %i\n\r",mahony_data.roll, mahony_data.pitch,mahony_data.yaw);
 
 
 
-		  UART_data_send.x = mahony_data.roll;    /** Create the Struct to send over UART**/
-		  UART_data_send.y = mahony_data.pitch;
+		  UART_data_send.x = -mahony_data.roll;    /** Create the Struct to send over UART**/
+		  UART_data_send.y = -mahony_data.pitch;
 		  UART_data_send.z = mahony_data.yaw;
 
+		  pointer_2_uart = &UART_data_send;
 
-		  PRINTF("UART PRINTS \r\n");
-//		  rtos_uart_send(UART,&UART_data_send,sizeof(UART_data_send));
+//		  PRINTF("UART PRINTS \r\n");
+		  rtos_uart_send(UART,(uint8_t *)pointer_2_uart,sizeof(pointer_2_uart)*4);  /** Full struct**/
+//		  rtos_uart_send(UART,&UART_data_send.header,sizeof(uint32_t));
+//		  rtos_uart_send(UART,&UART_data_send.x,sizeof(float));
+//		  rtos_uart_send(UART,&UART_data_send.y,sizeof(float));
+//		  rtos_uart_send(UART,&UART_data_send.z,sizeof(float));
 
 
-		  vTaskDelay(100);
+
+		  vTaskDelay(30);
 	    }
 }

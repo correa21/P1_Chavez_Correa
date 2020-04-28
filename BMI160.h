@@ -21,6 +21,8 @@
 #define BMI160_CMD_REGISTER 	0x7E //REGISTER TO COMUNICATE WITH PMU REGISTER
 #define BMI160_ACC_NORMAL_MODE 	0x11 //CMD_REG = ACCELEROMETER NORMAL MODE VALUE
 #define BMI160_GYRO_NORMAL_MODE 0x15 //CMD_REG = GYROSCOPE NORMAL MODE VALUE
+
+/** Adressing values to extract the Gyro and ACC data **/
 #define BMI160_GYRO_X_LSB_REG 	0x0C
 #define BMI160_GYRO_X_MSB_REG 	0x0D
 #define BMI160_GYRO_Y_LSB_REG 	0x0E
@@ -33,6 +35,12 @@
 #define BMI160_ACC_Y_MSB_REG 	0x15
 #define BMI160_ACC_Z_LSB_REG 	0x16
 #define BMI160_ACC_Z_MSB_REG 	0x17
+
+
+/* For BMI output processing*/
+#define DEGREES 360U
+#define DATA_RANGE_GYRO 32758U
+
 
 
 typedef struct{
